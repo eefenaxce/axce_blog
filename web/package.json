@@ -2,6 +2,9 @@
   "name": "axce-blog-frontend",
   "private": true,
   "type": "module",
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild", "msw"]
+  },
   "scripts": {
     "build": "react-router build",
     "dev": "react-router dev",
