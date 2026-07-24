@@ -1,0 +1,28 @@
+server:
+  port: "8080"
+  mode: "development"
+
+database:
+  host: "localhost"
+  port: "5432"
+  user: "postgres"
+  password: "password"
+  database: "axce_blog"
+  max_connections: 10
+
+redis:
+  host: "localhost"
+  port: "6379"
+  password: ""
+  db: 0
+
+jwt:
+  secret: "your-secret-key-here-must-be-at-least-32-characters"
+  expiration_hours: 24
+
+email:
+  host: "smtp.example.com"
+  port: 587
+  username: "your-email@example.com"
+  password: "your-email-password"
+  from: "your-email@example.com"
