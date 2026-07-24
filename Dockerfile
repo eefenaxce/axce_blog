@@ -4,10 +4,9 @@
 FROM node:24-alpine AS web-builder
 WORKDIR /app/web
 RUN apk add --no-cache python3 make g++ git
-COPY web/package.json web/pnpm-lock.yaml ./
+COPY web/package.json web/pnpm-lock.yaml web/pnpm-workspace.yaml ./
 RUN corepack enable && corepack prepare pnpm@latest --activate
-ENV PNPM_ONLY_BUILT_DEPENDENCIES=esbuild,msw
-RUN pnpm install
+RUN pnpm install --frozen-lockfile
 COPY web/ .
 RUN pnpm build
 
