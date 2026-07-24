@@ -6,7 +6,7 @@ WORKDIR /app/web
 RUN apk add --no-cache python3 make g++ git
 COPY web/package.json web/pnpm-lock.yaml web/pnpm-workspace.yaml ./
 RUN corepack enable && corepack prepare pnpm@latest --activate
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --ignore-scripts && pnpm rebuild esbuild msw
 COPY web/ .
 RUN pnpm build
 
