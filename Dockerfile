@@ -6,7 +6,8 @@ WORKDIR /app/web
 RUN apk add --no-cache python3 make g++ git
 COPY web/package.json web/pnpm-lock.yaml ./
 RUN corepack enable && corepack prepare pnpm@latest --activate
-RUN pnpm install --allow-build=esbuild,msw
+ENV PNPM_ONLY_BUILT_DEPENDENCIES=esbuild,msw
+RUN pnpm install
 COPY web/ .
 RUN pnpm build
 
