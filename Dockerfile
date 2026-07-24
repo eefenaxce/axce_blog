@@ -3,9 +3,10 @@
 # Stage 1: Build frontend assets
 FROM node:24-alpine AS web-builder
 WORKDIR /app/web
+RUN apk add --no-cache python3 make g++ git
 COPY web/package.json web/pnpm-lock.yaml ./
 RUN corepack enable && corepack prepare pnpm@latest --activate
-RUN pnpm install --frozen-lockfile
+RUN pnpm install
 COPY web/ .
 RUN pnpm build
 
