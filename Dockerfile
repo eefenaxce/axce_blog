@@ -4,7 +4,8 @@
 FROM node:24-alpine AS web-builder
 WORKDIR /app/web
 COPY web/package.json web/pnpm-lock.yaml ./
-RUN npm install -g pnpm && pnpm install --frozen-lockfile
+RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN pnpm install --frozen-lockfile
 COPY web/ .
 RUN pnpm build
 
