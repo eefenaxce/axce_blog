@@ -4,18 +4,13 @@
 FROM node:24-alpine AS web-builder
 WORKDIR /app/web
 COPY web/package.json web/pnpm-lock.yaml ./
-RUN npm config set registry https://registry.npmmirror.com && \
-    npm install -g pnpm && \
-    pnpm config set registry https://registry.npmmirror.com && \
-    pnpm install --frozen-lockfile
+RUN npm install -g pnpm && pnpm install --frozen-lockfile
 COPY web/ .
 RUN pnpm build
 
 # Stage 2: Build Go backend
-FROM golang:1.24-alpine AS go-builder
+FROM golang:1.26-alpine AS go-builder
 WORKDIR /app
-ENV GOPROXY=https://goproxy.cn,direct
-ENV GO111MODULE=on
 RUN apk add --no-cache git
 COPY go.mod go.sum ./
 RUN go mod download
