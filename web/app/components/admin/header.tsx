@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react"
 import { useNavigate } from "react-router"
 import { Bell, LogOut, User, ChevronDown } from "lucide-react"
 import { Button } from "../ui/button"
+import { ThemeToggle } from "~/components/theme-toggle"
 import { api } from "~/lib/api"
 import { useAdminUser } from "./user-context"
 import { useSiteSettings } from "~/components/settings-context"
@@ -55,6 +56,7 @@ export function AdminHeader() {
 
       {/* Right */}
       <div className="flex items-center gap-2">
+        <ThemeToggle className="h-8 w-8 text-muted-foreground hover:text-foreground" />
         <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
           <Bell className="h-4 w-4" />
         </Button>

@@ -11,12 +11,14 @@ import type { Route } from "./+types/root"
 import "./app.css"
 import { Toaster } from "sonner"
 import { SettingsProvider, useSiteSettings } from "./components/settings-context"
+import { ThemeProvider } from "./components/theme-provider"
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <SettingsProvider>
-      <html lang="zh-CN">
-        <head>
+    <ThemeProvider>
+      <SettingsProvider>
+        <html lang="zh-CN">
+          <head>
           <meta charSet="utf-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           <Title />
@@ -39,6 +41,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </body>
       </html>
     </SettingsProvider>
+    </ThemeProvider>
   )
 }
 

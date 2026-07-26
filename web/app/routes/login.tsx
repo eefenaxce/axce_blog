@@ -6,6 +6,7 @@ import { Input } from "../components/ui/input"
 import { Label } from "../components/ui/label"
 import { api } from "../lib/api"
 import { AnimatedPage, FadeIn } from "../components/animate"
+import { ThemeToggle } from "~/components/theme-toggle"
 import { toast } from "sonner"
 
 export default function Login() {
@@ -40,6 +41,9 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/50">
+      <div className="fixed right-4 top-4">
+        <ThemeToggle />
+      </div>
       <AnimatedPage className="w-full max-w-md">
         <Card className="w-full max-w-md">
           <CardHeader>

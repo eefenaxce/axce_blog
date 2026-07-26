@@ -469,11 +469,11 @@ func parseFragmentExpr(expr string, currentNode *html.Node, ctx *Context) (*Frag
 	// Check for parameters
 	parenIdx := strings.Index(fragPart, "(")
 	if parenIdx == -1 {
-		ref.Fragment = fragPart
+		ref.Fragment = evalFragmentName(fragPart, ctx)
 		return ref, nil
 	}
 
-	ref.Fragment = strings.TrimSpace(fragPart[:parenIdx])
+	ref.Fragment = evalFragmentName(strings.TrimSpace(fragPart[:parenIdx]), ctx)
 
 	// Extract parameters
 	if !strings.HasSuffix(fragPart, ")") {
@@ -505,6 +505,18 @@ func evalTemplateName(name string, ctx *Context) string {
 	// If it contains a ${ or a single-quote (string literal), evaluate it as
 	// a standard expression to produce the final template path.
 	if ctx != nil && (strings.Contains(name, "${") || strings.Contains(name, "'")) {
+		if val, err := evalStandard(name, ctx); err == nil {
+			return toStr(val)
+		}
+	}
+	return name
+}
+
+// evalFragmentName resolves a fragment name that may be a dynamic expression
+// (e.g. ${socials.socials_select}) into a plain string. Simple fragment names
+// are returned as-is.
+func evalFragmentName(name string, ctx *Context) string {
+	if ctx != nil && strings.HasPrefix(name, "${") && strings.HasSuffix(name, "}") {
 		if val, err := evalStandard(name, ctx); err == nil {
 			return toStr(val)
 		}

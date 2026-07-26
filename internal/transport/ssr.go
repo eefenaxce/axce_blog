@@ -74,6 +74,12 @@ func (h *SSRHandler) Serve(ctx fiber.Ctx) error {
 	out = h.authorRE.ReplaceAllLiteralString(out, `<meta name="author" content="`+html.EscapeString(author)+`"`)
 	out = h.copyrightRE.ReplaceAllLiteralString(out, `<meta name="copyright" content="`+html.EscapeString(copyright)+`"`)
 
+	// 在 </head> 之前注入网站图标（favicon）
+	if favicon := h.loadFavicon(ctx); favicon != "" {
+		out = h.headEndRE.ReplaceAllLiteralString(out,
+			`<link rel="icon" type="image/x-icon" href="`+html.EscapeString(favicon)+`" /></head>`)
+	}
+
 	// 在 </head> 之前注入激活主题信息
 	if activeThemeJSON != "" {
 		out = h.headEndRE.ReplaceAllLiteralString(out,
@@ -123,6 +129,17 @@ func (h *SSRHandler) loadMeta(ctx fiber.Ctx) (title, desc, kw, author, copyright
 		copyright = cleanSetting(v)
 	}
 	return
+}
+
+// loadFavicon 从数据库读取网站图标地址。
+func (h *SSRHandler) loadFavicon(ctx fiber.Ctx) string {
+	if h.settingService == nil {
+		return ""
+	}
+	if v, err := h.settingService.Get(ctx.Context(), "site_icon"); err == nil && v != "" {
+		return cleanSetting(v)
+	}
+	return ""
 }
 
 func cleanSetting(value string) string {

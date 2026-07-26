@@ -9,7 +9,7 @@ interface ModalProps {
   onOpenChange: (open: boolean) => void
   title: string
   children: React.ReactNode
-  size?: "sm" | "md" | "lg" | "xl"
+  size?: "sm" | "md" | "lg" | "xl" | "2xl"
 }
 
 const sizes = {
@@ -17,6 +17,7 @@ const sizes = {
   md: "max-w-md",
   lg: "max-w-lg",
   xl: "max-w-xl",
+  "2xl": "max-w-6xl",
 }
 
 export function Modal({ open, onOpenChange, title, children, size = "md" }: ModalProps) {

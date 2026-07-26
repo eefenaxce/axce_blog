@@ -3,7 +3,10 @@
   "private": true,
   "type": "module",
   "pnpm": {
-    "onlyBuiltDependencies": ["esbuild", "msw"]
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "msw"
+    ]
   },
   "scripts": {
     "build": "react-router build",
@@ -21,6 +24,7 @@
     "framer-motion": "^12.40.0",
     "isbot": "^5",
     "lucide-react": "^1.17.0",
+    "marked": "^18.0.7",
     "radix-ui": "^1.5.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
@@ -32,6 +36,7 @@
   },
   "devDependencies": {
     "@react-router/dev": "7.15.1",
+    "@tailwindcss/typography": "^0.5.20",
     "@tailwindcss/vite": "^4",
     "@types/node": "^22",
     "@types/react": "^19",
