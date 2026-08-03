@@ -711,7 +711,14 @@ func (r *SettingRepositoryImpl) Get(ctx context.Context, key string) (*models.Se
 }
 
 func (r *SettingRepositoryImpl) Set(ctx context.Context, key, value, description string) error {
-	jsonValue, _ := json.Marshal(value)
+	// If the value is already valid JSON (e.g. theme config), store it directly;
+	// otherwise marshal it to ensure JSONB compatibility.
+	var jsonValue []byte
+	if json.Valid([]byte(value)) {
+		jsonValue = []byte(value)
+	} else {
+		jsonValue, _ = json.Marshal(value)
+	}
 	return r.db.SetSetting(ctx, db.SetSettingParams{
 		Key:         key,
 		Value:       jsonValue,
@@ -736,7 +743,13 @@ func toSettingModel(s db.Setting) *models.Setting {
 		Key: s.Key,
 	}
 	if s.Value != nil {
-		json.Unmarshal(s.Value, &setting.Value)
+		// Try to unmarshal as a JSON value. If it succeeds, we get the inner
+		// string (e.g. "AXCE" → AXCE, or {"color":"red"} → {"color":"red"}).
+		// If it fails (e.g. raw non-JSON bytes from direct storage), fall back
+		// to treating the bytes as the plain string value.
+		if err := json.Unmarshal(s.Value, &setting.Value); err != nil {
+			setting.Value = string(s.Value)
+		}
 	}
 	if s.Description.Valid {
 		setting.Description = s.Description.String

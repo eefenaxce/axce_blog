@@ -842,7 +842,15 @@ func (s *ThemeService) UpdateThemeSetting(ctx context.Context, themeID string, u
 	}
 
 	// 合并更新
+	// 清理旧带点键（如风格项更新 "primary_color" 时删除已有的 "style.primary_color" 等），
+	// 避免 DB 中同时存在带点和无点键导致 buildThemeObject 渲染时出现非确定性覆盖。
 	for k, v := range updates {
+		suffix := "." + k
+		for existingKey := range values {
+			if strings.HasSuffix(existingKey, suffix) {
+				delete(values, existingKey)
+			}
+		}
 		values[k] = v
 	}
 

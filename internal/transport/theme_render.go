@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -794,21 +795,42 @@ func (r *ThemeRenderer) buildThemeObject(ctx context.Context) (map[string]any, e
 			// Build reverse map from leaf field name to full dotted default key so that
 			// DB values saved with unprefixed keys (e.g. "theme_mode") can be mapped to
 			// their canonical group-prefixed path (e.g. "basic.theme_mode").
-			reverseDefaults := make(map[string]string)
-			for dottedKey := range defaults {
+			// Sort keys first to ensure deterministic results.
+			sortedKeys := make([]string, 0, len(defaults))
+			for k := range defaults {
+				sortedKeys = append(sortedKeys, k)
+			}
+			sort.Strings(sortedKeys)
+
+			reverseDefaults := make(map[string]string, len(sortedKeys))
+			for _, dottedKey := range sortedKeys {
 				parts := strings.Split(dottedKey, ".")
 				reverseDefaults[parts[len(parts)-1]] = dottedKey
 			}
 
-			// Override with actual DB values.
-			// Keys already containing a dot are kept as-is. Unprefixed keys are
-			// resolved via settings.yaml defaults to produce the dotted path that
-			// templates expect (e.g. ${theme.config.basic.theme_mode}).
+			// Override with actual DB values — must be deterministic.
+			//
+			// settingsResp.Values may contain BOTH dotted keys (e.g. "basic.theme_mode",
+			// saved by Activate → ExtractDefaults) and unprefixed keys (e.g. "theme_mode",
+			// saved by the admin panel). When an unprefixed key resolves to the same
+			// qualified path as a dotted key, the result wins depending on Go map
+			// iteration order, which is random.
+			//
+			// Two-pass approach: apply dotted (theme defaults) keys first,
+			// then unprefixed (admin) keys so admin overrides always win and
+			// the result is deterministic regardless of iteration order.
 			for k, v := range settingsResp.Values {
 				if strings.Contains(k, ".") {
 					config[k] = v
-				} else if dottedKey, ok := reverseDefaults[k]; ok {
-					config[dottedKey] = v
+				}
+			}
+			for k, v := range settingsResp.Values {
+				if !strings.Contains(k, ".") {
+					if dottedKey, ok := reverseDefaults[k]; ok {
+						config[dottedKey] = v
+					} else {
+						config[k] = v
+					}
 				}
 			}
 		}
